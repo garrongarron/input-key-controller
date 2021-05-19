@@ -19,7 +19,7 @@ class CharacterController {
 
         eventBus.suscribe('keyListener', (arr) => {
             if (!this.flag) return
-            this.mode = modeController.run(arr)
+            this.mode = this.modeController.run(arr)
             this.direction = directionWSController.run(arr)
         })
     }

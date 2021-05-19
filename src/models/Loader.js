@@ -6,7 +6,8 @@ class Loader {
         let loader = new FBXLoader();
         let promises = []
         let animations = []
-        let animFrecuentlyUsed = [26, 35, 36, 49, 48, 50,
+        let animFrecuentlyUsed = [
+            26, 35, 36, 49, 48, 50,
             51, 17, 41, 10, 52, 26
         ]
 
