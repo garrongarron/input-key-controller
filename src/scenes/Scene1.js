@@ -8,7 +8,6 @@ import directionalLight, { ambientLight, hemiLight } from "../basic/Light.js";
 import resize from "../basic/Resize.js";
 import warrior from "../models/Warrior.js";
 import characterController from "../controller/CharacterController.js";
-// import directionController from "../controller/DirectionController.js";
 import keyListener from "../basic/KeyListener.js";
 
 class Scene1 extends MasterScene {
@@ -28,18 +27,15 @@ class Scene1 extends MasterScene {
         scene.add(cube)
         cube.position.y = -0.05
             // camera.lookAt(cube.position)
-            // warriorController.setScene(scene)
-            // warriorController
         warrior.getObject().then(mesh => {
-            console.log(mesh);
             scene.add(mesh)
-            characterController(mesh)
+            characterController.setMesh(mesh)
+            characterController.start()
         })
-
         keyListener.start()
     }
     close() {
-
+        characterController.stop()
     }
     click() {
         this.sceneHandler.goTo('scene2')

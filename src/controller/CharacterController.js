@@ -1,67 +1,49 @@
 import eventBus from "../basic/EventBus.js"
-import keyListener from "../basic/KeyListener.js";
 import FiniteStateMachine from "./FiniteStateMachineHacked.js";
 import directionWSController from "./DirectionWSController.js";
 import machine from "../basic/Machine.js";
-import animatorController, { createAnimator } from './statemachines/AnimatorController.js'
+import Modes from './statemachines/Modes.js'
+import settings from './statemachines/ModeSettings.js'
 
-let settings = {
-    'normal': {
-        transition: (input) => {
-            let state = 'normal'
-            if (input[0] == 16 && input[1] == true) {
-                return 'runner'
-            }
-            if (input[0] == 32 && input[1] == true) {
-                return 'ninja'
-            }
-            return state
+class CharacterController {
+    constructor(settings) {
+        this.modes = null
+        this.modeController = new FiniteStateMachine('normal', settings)
+        this.direction = 'idle'
+        this.mode = 'normal'
+        this.flag = false
+        this.list = null
+        this.callback = () => {
+            this.list[this.mode].run(this.direction, this.mode)
         }
-    },
-    'runner': {
-        transition: (input) => {
-            let state = 'runner'
-            if (input[0] == 16 && input[1] == false && !keyListener.isPressed(16)) {
-                return 'normal'
-            }
-            if (input[0] == 16 && input[1] == false && keyListener.isPressed(32)) {
-                return 'ninja'
-            }
-            if (input[0] == 32 && input[1] == true) {
-                return 'ninja'
-            }
-            return state
+
+        eventBus.suscribe('keyListener', (arr) => {
+            if (!this.flag) return
+            this.mode = modeController.run(arr)
+            this.direction = directionWSController.run(arr)
+        })
+    }
+
+    setMesh(mesh) {
+        if (this.modes == null) {
+            this.modes = new Modes(mesh)
+            this.list = this.modes.getModes()
         }
-    },
-    'ninja': {
-        transition: (input) => {
-            let state = 'ninja'
-            if (input[0] == 32 && input[1] == false && !keyListener.isPressed(16)) {
-                return 'normal'
-            }
-            if (input[0] == 32 && input[1] == false && keyListener.isPressed(16)) {
-                return 'runner'
-            }
-            if (input[0] == 16 && input[1] == true) {
-                return 'runner'
-            }
-            return state
-        }
-    },
+    }
+
+    start() {
+        this.flag = true
+        this.modes.start()
+        machine.addCallback(this.callback)
+    }
+
+    stop() {
+        this.flag = false
+        this.modes.stop()
+        machine.removeCallback(this.callback)
+    }
 }
 
-let modeController = new FiniteStateMachine('normal', settings)
-let mode = 'normal'
-let direction = 'idle'
-eventBus.suscribe('keyListener', (arr) => {
-    mode = modeController.run(arr)
-    direction = directionWSController.run(arr)
-})
+let characterController = new CharacterController(settings)
 
-let characterController = (mesh) => {
-    createAnimator(mesh)
-    machine.addCallback(() => {
-        animatorController[mode].run(direction, mode)
-    })
-}
 export default characterController

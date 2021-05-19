@@ -64,7 +64,7 @@ let settings = {
     }
 }
 
-let directionWASDController = new FiniteStateMachineHacked('idle', settings)
+let directionWSController = new FiniteStateMachineHacked('idle', settings)
 
 
-export default directionWASDController
+export default directionWSController
